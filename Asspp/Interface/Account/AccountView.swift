@@ -12,6 +12,9 @@ struct AccountView: View {
     @State private var vm = AppStore.this
     @State private var addAccount = false
     @State private var selectedID: AppStore.UserAccount.ID?
+    #if os(macOS)
+        @State private var navigationPath = NavigationPath()
+    #endif
 
     var body: some View {
         #if os(macOS)
@@ -23,7 +26,7 @@ struct AccountView: View {
 
     #if os(macOS)
         private var macOSBody: some View {
-            NavigationStack {
+            NavigationStack(path: $navigationPath) {
                 accountsTable
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
                     .navigationTitle("Accounts")
@@ -39,10 +42,9 @@ struct AccountView: View {
         private var accountsTable: some View {
             Table(vm.accounts, selection: $selectedID) {
                 TableColumn("Email") { account in
-                    NavigationLink(value: account.id) {
-                        Text(account.account.email)
-                            .redacted(reason: .placeholder, isEnabled: vm.demoMode)
-                    }
+                    Text(account.account.email)
+                        .redacted(reason: .placeholder, isEnabled: vm.demoMode)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                 }
 
                 TableColumn("Region") { account in
@@ -51,6 +53,23 @@ struct AccountView: View {
 
                 TableColumn("Storefront") { account in
                     Text(ApplePackage.Configuration.countryCode(for: account.account.store) ?? "-")
+                }
+
+                TableColumn("") { account in
+                    Button {
+                        navigationPath.append(account.id)
+                    } label: {
+                        Image(systemName: "info.circle")
+                    }
+                    .buttonStyle(.borderless)
+                }
+                .width(32)
+            }
+            .contextMenu(forSelectionType: AppStore.UserAccount.ID.self) { ids in
+                if let id = ids.first {
+                    Button("View Details") {
+                        navigationPath.append(id)
+                    }
                 }
             }
             .navigationDestination(for: AppStore.UserAccount.ID.self) { id in
