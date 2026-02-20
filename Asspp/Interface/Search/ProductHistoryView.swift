@@ -55,9 +55,7 @@ struct ProductHistoryView: View {
                     .background(.ultraThinMaterial)
                 ProgressView()
                     .progressViewStyle(.circular)
-                #if os(macOS)
-                    .controlSize(.small)
-                #endif
+                    .smallControlSizeOnMac()
             }
             .opacity(vm.loading ? 1 : 0)
             .animation(.default, value: vm.loading)

@@ -12,9 +12,7 @@ struct AccountView: View {
     @State private var vm = AppStore.this
     @State private var addAccount = false
     @State private var selectedID: AppStore.UserAccount.ID?
-    #if os(macOS)
-        @State private var navigationPath = NavigationPath()
-    #endif
+    @State private var navigationPath = NavigationPath()
 
     var body: some View {
         #if os(macOS)
@@ -50,10 +48,12 @@ struct AccountView: View {
                 TableColumn("Region") { account in
                     Text(account.account.store)
                 }
+                .width(min: 40, ideal: 60, max: 80)
 
                 TableColumn("Storefront") { account in
                     Text(ApplePackage.Configuration.countryCode(for: account.account.store) ?? "-")
                 }
+                .width(min: 60, ideal: 80, max: 120)
 
                 TableColumn("") { account in
                     Button {
@@ -118,23 +118,42 @@ struct AccountView: View {
 
     #if !os(macOS)
         private var iOSBody: some View {
-            NavigationStack {
+            NavigationStack(path: $navigationPath) {
                 List {
                     Section {
                         ForEach(vm.accounts) { account in
-                            NavigationLink(destination: AccountDetailView(accountId: account.id)) {
-                                Text(account.account.email)
-                                    .redacted(reason: .placeholder, isEnabled: vm.demoMode)
+                            NavigationLink(value: account.id) {
+                                HStack {
+                                    Text(account.account.email)
+                                        .redacted(reason: .placeholder, isEnabled: vm.demoMode)
+                                    Spacer()
+                                }
+                                .badge(ApplePackage.Configuration.countryCode(for: account.account.store) ?? account.account.store)
                             }
-                        }
-                        if vm.accounts.isEmpty {
-                            Text("No accounts yet.")
                         }
                     } header: {
                         Text("Apple IDs")
                     } footer: {
                         Text("Your accounts are saved in your Keychain and will be synced across devices with the same iCloud account signed in.")
                     }
+                }
+                .overlay {
+                    if vm.accounts.isEmpty {
+                        ContentUnavailableView(
+                            label: {
+                                Label("No Accounts", systemImage: "person.crop.circle.badge.questionmark")
+                            },
+                            description: {
+                                Text("Add an Apple ID to start downloading IPA packages.")
+                            },
+                            actions: {
+                                Button("Add Account") { addAccount.toggle() }
+                            },
+                        )
+                    }
+                }
+                .navigationDestination(for: AppStore.UserAccount.ID.self) { id in
+                    AccountDetailView(accountId: id)
                 }
                 .navigationTitle("Accounts")
                 .toolbar {

@@ -43,8 +43,26 @@ struct PackageView: View {
                 ArchivePreviewView(archive: archive)
             } header: {
                 Text("Package")
-            } footer: {
-                Text("\(archive.software.bundleID) - \(archive.software.version)")
+            }
+
+            Section {
+                CopyableRow(label: "Bundle ID", value: archive.software.bundleID, monospaced: true)
+                Text("Version")
+                    .badge(archive.software.version)
+                Text("Developer")
+                    .badge(archive.software.sellerName)
+                if !archive.software.primaryGenreName.isEmpty {
+                    Text("Category")
+                        .badge(archive.software.primaryGenreName)
+                }
+                Text("Compatibility")
+                    .badge("\(archive.software.minimumOsVersion)+")
+                if archive.software.userRatingCount > 0 {
+                    Text("Rating")
+                        .badge("\(String(format: "%.1f", archive.software.averageUserRating)) (\(archive.software.userRatingCount))")
+                }
+            } header: {
+                Text("Details")
             }
 
             if pkg.completed {

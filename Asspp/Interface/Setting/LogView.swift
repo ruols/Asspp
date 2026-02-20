@@ -55,7 +55,6 @@ struct LogView: View {
                     } label: {
                         Text("Show Logs")
                             .font(.system(.body, design: .rounded, weight: .semibold))
-                            .frame(maxWidth: 280)
                     }
                     .buttonStyle(.borderedProminent)
                     .tint(.red)

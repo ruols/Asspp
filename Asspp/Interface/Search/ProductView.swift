@@ -58,6 +58,7 @@ struct ProductView: View {
             accountSelector
             buttons
             packageHeader
+            packageDetails
             packageDescription
             if account == nil {
                 Section {
@@ -123,16 +124,32 @@ struct ProductView: View {
                 Text("Version \(archive.package.software.version)")
                     .badge(badgeText)
             }
+        } header: {
+            Text("Package")
+        }
+    }
 
+    var packageDetails: some View {
+        Section {
+            CopyableRow(label: "Bundle ID", value: archive.package.software.bundleID, monospaced: true)
+            Text("Developer")
+                .badge(archive.package.software.sellerName)
+            if !archive.package.software.primaryGenreName.isEmpty {
+                Text("Category")
+                    .badge(archive.package.software.primaryGenreName)
+            }
             if let formattedSize {
                 Text("Size")
                     .badge(formattedSize)
             }
-
             Text("Compatibility")
                 .badge("\(archive.package.software.minimumOsVersion)+")
+            if archive.package.software.userRatingCount > 0 {
+                Text("Rating")
+                    .badge("\(String(format: "%.1f", archive.package.software.averageUserRating)) (\(archive.package.software.userRatingCount))")
+            }
         } header: {
-            Text("Package")
+            Text("Details")
         }
     }
 
@@ -147,7 +164,6 @@ struct ProductView: View {
     var pricing: some View {
         Section {
             Text("\(archive.formattedPrice ?? "N/A")")
-                .font(.system(.body, design: .rounded))
             if archive.price == 0 {
                 AsyncButton {
                     guard let account else { return }

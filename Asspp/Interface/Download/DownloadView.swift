@@ -11,26 +11,22 @@ struct DownloadView: View {
     @State private var vm = Downloads.this
 
     var body: some View {
-        #if os(iOS)
-            NavigationStack {
-                content
-                    .navigationTitle("Downloads")
-            }
-        #else
-            NavigationStack {
-                content
-                    .navigationTitle("Downloads")
-            }
-        #endif
+        NavigationStack {
+            content
+                .navigationTitle("Downloads")
+        }
     }
 
-    var content: some View {
+    private var content: some View {
         FormOnTahoeList {
             if vm.manifests.isEmpty {
                 Text("No downloads yet.")
             } else {
                 packageList
             }
+        }
+        .navigationDestination(for: PackageManifest.self) { manifest in
+            PackageView(pkg: manifest)
         }
         .toolbar {
             NavigationLink(destination: AddDownloadView()) {
@@ -39,9 +35,9 @@ struct DownloadView: View {
         }
     }
 
-    var packageList: some View {
+    private var packageList: some View {
         ForEach(vm.manifests, id: \.id) { req in
-            NavigationLink(destination: PackageView(pkg: req)) {
+            NavigationLink(value: req) {
                 VStack(spacing: 8) {
                     ArchivePreviewView(archive: req.package)
                     SimpleProgress(progress: req.state.percent)

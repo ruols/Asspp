@@ -26,7 +26,7 @@ struct PackageDisplayView: View {
                         style = .detail
                     } label: {
                         Text("More")
-                            .font(.system(.footnote, design: .rounded))
+                            .foregroundStyle(.secondary)
                             .padding(.leading, 10)
                     }
                     .buttonStyle(.borderless)
@@ -55,7 +55,7 @@ struct PackageDisplayView: View {
                         Text(archive.software.description)
                     }
                 }
-                .font(.system(.footnote, design: .rounded))
+                .foregroundStyle(.secondary)
             }
         }
     }

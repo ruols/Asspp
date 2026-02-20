@@ -9,13 +9,6 @@ import ApplePackage
 import ButtonKit
 import SwiftUI
 
-#if canImport(UIKit)
-    import UIKit
-#endif
-#if canImport(AppKit) && !canImport(UIKit)
-    import AppKit
-#endif
-
 struct AccountDetailView: View {
     let accountId: AppStore.UserAccount.ID
 
@@ -98,16 +91,5 @@ struct AccountDetailView: View {
             }
         }
         .navigationTitle("Account Details")
-    }
-
-    func copyToClipboard(_ text: String?) {
-        guard let text, !text.isEmpty else { return }
-        #if canImport(UIKit)
-            UIPasteboard.general.string = text
-        #elseif canImport(AppKit) && !canImport(UIKit)
-            let pasteboard = NSPasteboard.general
-            pasteboard.clearContents()
-            pasteboard.setString(text, forType: .string)
-        #endif
     }
 }

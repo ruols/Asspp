@@ -57,6 +57,15 @@ extension View {
     }
 
     @ViewBuilder
+    func smallControlSizeOnMac() -> some View {
+        #if os(macOS)
+            controlSize(.small)
+        #else
+            self
+        #endif
+    }
+
+    @ViewBuilder
     func hide() -> some View {}
 }
 
